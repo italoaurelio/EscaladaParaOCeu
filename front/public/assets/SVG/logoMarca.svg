@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Camada_2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 71 118.89">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #ffc107;
+        font-size: 78px;
+      }
+
+      .cls-2 {
+        font-family: 'moon_get-Heavy', 'MOON GET!';
+        font-weight: 800;
+      }
+
+      .cls-3 {
+        font-family: MyriadPro-Regular, 'Myriad Pro';
+      }
+    </style>
+  </defs>
+  <g id="Camada_1-2" data-name="Camada_1">
+    <text class="cls-1" transform="translate(.6 74.2)"><tspan class="cls-2" x="0" y="0">E</tspan><tspan class="cls-3" x="51.17" y="-4">|</tspan></text>
+  </g>
+</svg>
