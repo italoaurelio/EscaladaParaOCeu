@@ -1,135 +1,140 @@
-import React, { useState } from 'react';
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import interactionPlugin from '@fullcalendar/interaction'; // Para interação
-import '@fullcalendar/core/main.css';
-import '@fullcalendar/daygrid/main.css';
-import '@fullcalendar/interaction/main.css';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { Calendar, momentLocalizer } from "react-big-calendar";
+import moment from "moment";
+import "react-big-calendar/lib/css/react-big-calendar.css";
+import "bootswatch/dist/darkly/bootstrap.min.css"; // Tema escuro
+import "../styles/calendarioCustom.css";
 
-// Definindo as cores dos tempos litúrgicos
+// Cores litúrgicas
 const liturgicalColors = {
-  Advento: '#4F46E5',
-  Natal: '#DC2626',
-  Páscoa: '#FBBF24',
-  Comum: '#16A34A',
+  verde: "#28a745",
+  branco: "#ffffff",
+  vermelho: "#dc3545",
+  roxo: "#6f42c1",
+  preto: "#000000",
+  rosa: "#ffc0cb",
 };
 
-const CalendarPage = () => {
+const localizer = momentLocalizer(moment);
+
+const CalendarApp = () => {
   const [events, setEvents] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-  const [currentEvent, setCurrentEvent] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [ministryModalOpen, setMinistryModalOpen] = useState(false);
+  const [ministryName, setMinistryName] = useState("");
+  const [parishes, setParishes] = useState([]); // Estado para armazenar as paróquias
+  const [selectedParish, setSelectedParish] = useState(""); // Paróquia selecionada
 
-  const handleDateClick = (info) => {
-    setCurrentEvent({
-      id: Date.now(),
-      title: '',
-      description: '',
-      category: 'Advento', // Cor inicial, pode ser alterado
-      people: 10, // Número de pessoas inicialmente
-      date: info.dateStr,
-    });
-    setShowModal(true);
-  };
+  // Função para buscar as paróquias do banco de dados
+  useEffect(() => {
+    const fetchParishes = async () => {
+      try {
+        const response = await axios.get("/paroquias"); // Substitua pela URL da sua API
+        setParishes(response.data); // Supondo que o retorno seja um array de paróquias
+      } catch (error) {
+        console.error("Erro ao carregar paróquias:", error);
+      }
+    };
 
-  const handleEventClick = (clickInfo) => {
-    const event = clickInfo.event;
-    alert(`Evento: ${event.title}\nDescrição: ${event.extendedProps.description}`);
-    // Mostra o botão "Eu vou" ou algo do tipo, e decrementa 1 na quantidade de pessoas
-    if (event.extendedProps.people > 0) {
-      event.setExtendedProp('people', event.extendedProps.people - 1);
+    fetchParishes();
+  }, []);
+
+  const handleMinistrySubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedParish) {
+      alert("Por favor, selecione uma paróquia.");
+      return;
+    }
+
+    try {
+      const ministryData = { name: ministryName, parishID: selectedParish };
+      await axios.post("/ministerios", ministryData); // Substitua pela URL da sua API
+      alert(`Ministério '${ministryName}' criado com sucesso!`);
+      setMinistryName("");
+      setSelectedParish("");
+      setMinistryModalOpen(false);
+    } catch (error) {
+      console.error("Erro ao criar ministério:", error);
+      alert("Ocorreu um erro ao criar o ministério.");
     }
   };
 
-  const handleSaveEvent = () => {
-    setEvents([...events, currentEvent]);
-    setShowModal(false);
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setCurrentEvent({ ...currentEvent, [name]: value });
-  };
-
   return (
-    <div className="p-8">
-      <h1 className="text-3xl mb-4">Calendário de Missas</h1>
-      <FullCalendar
-        plugins={[dayGridPlugin, interactionPlugin]}
-        initialView="dayGridMonth"
-        events={events.map((event) => ({
-          ...event,
-          backgroundColor: liturgicalColors[event.category],
-          borderColor: liturgicalColors[event.category],
-        }))}
-        dateClick={handleDateClick}
-        eventClick={handleEventClick}
-      />
-      
-      {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
-          <div className="bg-white p-6 rounded-lg w-96">
-            <h2 className="text-2xl mb-4">Editar Missa</h2>
-            <div className="mb-4">
-              <label htmlFor="title" className="block text-lg">Nome da Missa</label>
-              <input
-                type="text"
-                id="title"
-                name="title"
-                value={currentEvent.title}
-                onChange={handleInputChange}
-                className="w-full p-2 mt-2 border rounded-md"
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="description" className="block text-lg">Descrição</label>
-              <textarea
-                id="description"
-                name="description"
-                value={currentEvent.description}
-                onChange={handleInputChange}
-                className="w-full p-2 mt-2 border rounded-md"
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="people" className="block text-lg">Quantas pessoas</label>
-              <input
-                type="number"
-                id="people"
-                name="people"
-                value={currentEvent.people}
-                onChange={handleInputChange}
-                className="w-full p-2 mt-2 border rounded-md"
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="category" className="block text-lg">Selecione o Tempo Litúrgico</label>
-              <select
-                id="category"
-                name="category"
-                value={currentEvent.category}
-                onChange={handleInputChange}
-                className="w-full p-2 mt-2 border rounded-md"
-              >
-                <option value="Advento">Advento</option>
-                <option value="Natal">Natal</option>
-                <option value="Páscoa">Páscoa</option>
-                <option value="Comum">Comum</option>
-              </select>
-            </div>
-            <div className="flex justify-between">
-              <button
-                onClick={() => setShowModal(false)}
-                className="px-4 py-2 bg-gray-300 rounded-md"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleSaveEvent}
-                className="px-4 py-2 bg-blue-500 text-white rounded-md"
-              >
-                Salvar
-              </button>
-            </div>
+    <div className="p-6 min-h-screen">
+      <h1 className="text-center text-3xl mb-6 text-white">Calendário Litúrgico</h1>
+      <div className="flex justify-between mb-6">
+        <button
+          className="px-4 py-2 bg-gold-900 text-black rounded"
+          onClick={() => setMinistryModalOpen(true)}
+        >
+          Criar Ministério
+        </button>
+      </div>
+      <div className="p-6 rounded-lg shadow-xl">
+        <Calendar
+          localizer={localizer}
+          events={events}
+          startAccessor="start"
+          endAccessor="end"
+          selectable
+          style={{ height: 600 }}
+          className="rounded-lg"
+          eventPropGetter={(event) => ({
+            style: {
+              backgroundColor: event.color,
+              border: "none",
+            },
+          })}
+        />
+      </div>
+
+      {/* Modal para adicionar ministério */}
+      {ministryModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-blackMode-700 p-6 rounded-lg shadow-lg w-full max-w-4xl">
+            <h2 className="text-xl font-bold mb-4 text-center text-white">Criar Ministério</h2>
+            <form onSubmit={handleMinistrySubmit} className="space-y-4">
+              <div className="mb-4">
+                <label className="block text-sm mb-2 text-white">Nome do Ministério</label>
+                <input
+                  type="text"
+                  placeholder="Digite o nome do ministério"
+                  value={ministryName}
+                  onChange={(e) => setMinistryName(e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-md bg-blackMode-700 text-white"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm mb-2 text-white">Selecione a Paróquia</label>
+                <select
+                  value={selectedParish}
+                  onChange={(e) => setSelectedParish(e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-md bg-blackMode-700 text-white"
+                  required
+                >
+                  <option value="">Selecione uma paróquia</option>
+                  {parishes.map((parish) => (
+                    <option key={parish.paroquiaID} value={parish.paroquiaID}>
+                      {parish.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setMinistryModalOpen(false)}
+                  className="px-6 py-2 mr-4 bg-gray-600 text-white rounded"
+                >
+                  Cancelar
+                </button>
+                <button type="submit" className="px-6 py-2 bg-gold-900 text-black rounded">
+                  Criar
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
@@ -137,4 +142,4 @@ const CalendarPage = () => {
   );
 };
 
-export default CalendarPage;
+export default CalendarApp;

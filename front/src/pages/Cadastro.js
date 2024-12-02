@@ -3,9 +3,9 @@ import axios from "axios";
 
 function Cadastro() {
   const [formData, setFormData] = useState({
-    nome: "",
-    email: "",
-    senha: "",
+    Nome: "",
+    Email: "",
+    Senha: ""
   });
 
   const handleChange = (e) => {
@@ -15,13 +15,13 @@ function Cadastro() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Dados do formulário:', formData);
     try {
-      // Verifique se a URL está correta, no caso, o backend está rodando na porta 3000
-      const response = await axios.post("http://localhost:3000/usuarios/cadastro", formData);
-      console.log(response.data);
+      const response = await axios.post("http://localhost:3000/cadastro", formData);
+      console.log('Resposta do servidor:', response);
       alert("Cadastro realizado com sucesso!");
     } catch (error) {
-      console.error("Erro ao cadastrar:", error);
+      console.error('Erro ao cadastrar:', error.response ? error.response.data : error.message);
       alert("Erro ao cadastrar usuário. Tente novamente.");
     }
   };
@@ -31,50 +31,50 @@ function Cadastro() {
       <h2 className="text-2xl font-bold mb-4 text-white">Cadastro</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="nome" className="block text-sm font-medium text-white">
+          <label htmlFor="Nome" className="block text-sm font-medium text-white">
             Nome
           </label>
           <input
             type="text"
-            id="nome"
-            name="nome"
-            value={formData.nome}
+            id="Nome"
+            name="Nome"
+            value={formData.Nome}
             onChange={handleChange}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-gold-900 focus:border-gold-900 sm:text-sm"
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 text-blackMode-600 rounded-md shadow-sm focus:ring-gold-900 focus:border-gold-900 sm:text-sm"
             required
           />
         </div>
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-white">
+          <label htmlFor="Email" className="block text-sm font-medium text-white">
             Email
           </label>
           <input
             type="email"
-            id="email"
-            name="email"
-            value={formData.email}
+            id="Email"
+            name="Email"
+            value={formData.Email}
             onChange={handleChange}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-gold-900 focus:border-gold-900 sm:text-sm"
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 text-blackMode-600 rounded-md shadow-sm focus:ring-gold-900 focus:border-gold-900 sm:text-sm"
             required
           />
         </div>
         <div>
-          <label htmlFor="senha" className="block text-sm font-medium text-white">
+          <label htmlFor="Senha" className="block text-sm font-medium text-white">
             Senha
           </label>
           <input
             type="password"
-            id="senha"
-            name="senha"
-            value={formData.senha}
+            id="Senha"
+            name="Senha"
+            value={formData.Senha}
             onChange={handleChange}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-gold-900 focus:border-gold-900 sm:text-sm"
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 text-blackMode-600 rounded-md shadow-sm focus:ring-gold-900 focus:border-gold-900 sm:text-sm"
             required
           />
         </div>
         <button
           type="submit"
-          className="w-full bg-gold-900 text-blackMode-700 px-4 py-2 rounded-md shadow-md hover:bg-gold-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+          className="w-full bg-gold-900 text-blackMode-700 px-4 py-2 rounded-md shadow-md hover:bg-gold-700 focus:outline-none focus:ring-2 focus:white focus:ring-offset-2"
         >
           Cadastrar
         </button>

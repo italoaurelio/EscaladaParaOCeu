@@ -1,0 +1,11 @@
+.rbc-day-bg.rbc-today, .rbc-off-range-bg, .rbc-today, .rbc-toolbar button.rbc-active  {
+    background-color: #FFB000 !important;
+  }
+
+  .rbc-off-range{
+    color: #1C1C1C !important; 
+  }
+
+  .rbc-toolbar button {
+    color: white;
+  }
